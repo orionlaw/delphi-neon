@@ -19,7 +19,7 @@
 {  limitations under the License.                                              }
 {                                                                              }
 {******************************************************************************}
-unit Neon.Tests.Types.Reference;
+unit Neon.Tests.Config.MemberCase;
 
 interface
 
@@ -28,43 +28,43 @@ uses
 
   Neon.Core.Persistence,
   Neon.Tests.Entities,
-  Neon.Tests.Utils;
+  Neon.Tests.Utils,
+  Neon.Core.Types;
 
 type
   [TestFixture]
-  [Category('reftypes')]
-  TTestReferenceTypes = class(TObject)
+  [Category('membercase')]
+  TTestConfigMemberCase = class(TObject)
   private
     FDataPath: string;
-    FPerson1: TPerson;
-    FPerson2: TPerson;
+    FCaseObj1: TCaseClass;
 
     function GetFileName(const AMethod: string): string;
   public
-    constructor Create;
-    destructor Destroy; override;
-
     [Setup]
     procedure Setup;
     [TearDown]
     procedure TearDown;
 
     [Test]
-    [TestCase('TestPersonAnsi', 'TestPersonAnsi')]
-    procedure TestPersonAnsi(const AMethod: string);
+    [TestCase('TestPascalCase', 'TestPascalCase')]
+    procedure TestPascalCase(const AMethod: string);
 
     [Test]
-    [TestCase('TestPersonUnicode', 'TestPersonUnicode')]
-    procedure TestPersonUnicode(const AMethod: string);
+    [TestCase('TestCamelCase', 'TestCamelCase')]
+    procedure TestCamelCase(const AMethod: string);
 
     [Test]
-    [TestCase('TestPersonPretty', 'TestPersonPretty')]
-    procedure TestPersonPretty(const AMethod: string);
+    [TestCase('TestSnakeCase', 'TestSnakeCase')]
+    procedure TestSnakeCase(const AMethod: string);
 
     [Test]
-    [TestCase('TestPersonNil', 'TestPersonNil')]
-    procedure TestPersonNil(const AMethod: string);
+    [TestCase('TestLowerCase', 'TestLowerCase')]
+    procedure TestLowerCase(const AMethod: string);
 
+    [Test]
+    [TestCase('TestUpperCase', 'TestUpperCase')]
+    procedure TestUpperCase(const AMethod: string);
   end;
 
 implementation
@@ -72,73 +72,70 @@ implementation
 uses
   System.IOUtils, System.DateUtils;
 
-constructor TTestReferenceTypes.Create;
+function TTestConfigMemberCase.GetFileName(const AMethod: string): string;
+begin
+  Result := TPath.Combine(FDataPath, ClassName + '.' + AMethod + '.json');
+end;
+
+procedure TTestConfigMemberCase.Setup;
 begin
   FDataPath := TDirectory.GetCurrentDirectory;
   FDataPath := TDirectory.GetParent(FDataPath);
   FDataPath := TDirectory.GetParent(FDataPath);
   FDataPath := TPath.Combine(FDataPath, 'Data');
 
-  FPerson1 := TPerson.Create('Paolo', 50);
-  FPerson1.AddAddress('Via Trento, 30', 'Parma', 'Italy', True);
-  FPerson1.AddContact(TContactType.Phone, '+39.123.4567890');
-  FPerson1.AddContact(TContactType.Email, 'paolo@mail.com');
-
-  FPerson2 := TPerson.Create('', -0);
-  FPerson2.AddAddress('Via Москва 334', 'Москва', 'Россия', True);
-  FPerson2.AddContact(TContactType.Phone, '+39.123.4567890');
-  FPerson2.AddContact(TContactType.Email, 'paolo@mail.com');
+  FCaseObj1 := TCaseClass.Create('Paolo', 'Rossi', 'Male', 'Italy', 50);
 end;
 
-destructor TTestReferenceTypes.Destroy;
+procedure TTestConfigMemberCase.TearDown;
 begin
-  FPerson1.Free;
-  FPerson2.Free;
-
-  inherited;
+  FCaseObj1.Free;
 end;
 
-function TTestReferenceTypes.GetFileName(const AMethod: string): string;
-begin
-  Result := TPath.Combine(FDataPath, ClassName + '.' + AMethod + '.json');
-end;
-
-procedure TTestReferenceTypes.Setup;
-begin
-end;
-
-procedure TTestReferenceTypes.TearDown;
-begin
-end;
-
-procedure TTestReferenceTypes.TestPersonAnsi(const AMethod: string);
+procedure TTestConfigMemberCase.TestPascalCase(const AMethod: string);
 begin
   Assert.AreEqual(
     TTestUtils.ExpectedFromFile(GetFileName(AMethod)),
-    TTestUtils.SerializeObject(FPerson1));
+    TTestUtils.SerializeObject(FCaseObj1, TNeonConfiguration.Default));
 end;
 
-procedure TTestReferenceTypes.TestPersonNil(const AMethod: string);
-begin
-  Assert.AreEqual('{}',
-    TTestUtils.SerializeObject(nil, TNeonConfiguration.Default));
-end;
-
-procedure TTestReferenceTypes.TestPersonPretty(const AMethod: string);
+procedure TTestConfigMemberCase.TestSnakeCase(const AMethod: string);
 begin
   Assert.AreEqual(
     TTestUtils.ExpectedFromFile(GetFileName(AMethod)),
-    TTestUtils.SerializeObject(FPerson1, TNeonConfiguration.Pretty));
+    TTestUtils.SerializeObject(FCaseObj1, TNeonConfiguration.Snake));
 end;
 
-procedure TTestReferenceTypes.TestPersonUnicode(const AMethod: string);
+procedure TTestConfigMemberCase.TestUpperCase(const AMethod: string);
+var
+  LConfig: INeonConfiguration;
+begin
+  LConfig := TNeonConfiguration.Default;
+  LConfig.SetMemberCase(TNeonCase.UpperCase);
+  Assert.AreEqual(
+    TTestUtils.ExpectedFromFile(GetFileName(AMethod)),
+    TTestUtils.SerializeObject(FCaseObj1, LConfig));
+end;
+
+procedure TTestConfigMemberCase.TestCamelCase(const AMethod: string);
 begin
   Assert.AreEqual(
     TTestUtils.ExpectedFromFile(GetFileName(AMethod)),
-    TTestUtils.SerializeObject(FPerson2));
+    TTestUtils.SerializeObject(FCaseObj1, TNeonConfiguration.Camel));
+end;
+
+procedure TTestConfigMemberCase.TestLowerCase(const AMethod: string);
+var
+  LConfig: INeonConfiguration;
+begin
+  LConfig := TNeonConfiguration.Default;
+  LConfig.SetMemberCase(TNeonCase.LowerCase);
+  Assert.AreEqual(
+    TTestUtils.ExpectedFromFile(GetFileName(AMethod)),
+    TTestUtils.SerializeObject(FCaseObj1, LConfig));
 end;
 
 initialization
-  TDUnitX.RegisterTestFixture(TTestReferenceTypes);
+  TDUnitX.RegisterTestFixture(TTestConfigMemberCase);
 
 end.

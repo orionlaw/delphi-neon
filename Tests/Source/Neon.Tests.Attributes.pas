@@ -1,4 +1,4 @@
-{******************************************************************************}
+﻿{******************************************************************************}
 {                                                                              }
 {  Neon: Serialization Library for Delphi                                      }
 {  Copyright (c) 2018-2019 Paolo Rossi                                         }
@@ -19,54 +19,64 @@
 {  limitations under the License.                                              }
 {                                                                              }
 {******************************************************************************}
-package NeonRunTime;
+unit Neon.Tests.Attributes;
 
-{$R *.res}
-{$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
-{$ALIGN 8}
-{$ASSERTIONS ON}
-{$BOOLEVAL OFF}
-{$DEBUGINFO OFF}
-{$EXTENDEDSYNTAX ON}
-{$IMPORTEDDATA ON}
-{$IOCHECKS ON}
-{$LOCALSYMBOLS ON}
-{$LONGSTRINGS ON}
-{$OPENSTRINGS ON}
-{$OPTIMIZATION OFF}
-{$OVERFLOWCHECKS OFF}
-{$RANGECHECKS OFF}
-{$REFERENCEINFO ON}
-{$SAFEDIVIDE OFF}
-{$STACKFRAMES ON}
-{$TYPEDADDRESS OFF}
-{$VARSTRINGCHECKS ON}
-{$WRITEABLECONST OFF}
-{$MINENUMSIZE 1}
-{$IMAGEBASE $400000}
-{$DEFINE DEBUG}
-{$ENDIF IMPLICITBUILDING}
-{$DESCRIPTION 'Neon Serialization Library'}
-{$LIBSUFFIX '260'}
-{$RUNONLY}
-{$IMPLICITBUILD OFF}
+interface
 
-requires
-  rtl,
-  dbrtl;
+uses
+  System.SysUtils, System.Rtti, DUnitX.TestFramework,
 
-contains
-  Neon.Core.Attributes in '..\..\Source\Neon.Core.Attributes.pas',
-  Neon.Core.DynamicTypes in '..\..\Source\Neon.Core.DynamicTypes.pas',
-  Neon.Core.Nullables in '..\..\Source\Neon.Core.Nullables.pas',
-  Neon.Core.Persistence.JSON in '..\..\Source\Neon.Core.Persistence.JSON.pas',
-  Neon.Core.Persistence in '..\..\Source\Neon.Core.Persistence.pas',
-  Neon.Core.Persistence.Swagger in '..\..\Source\Neon.Core.Persistence.Swagger.pas',
-  Neon.Core.Serializers.RTL in '..\..\Source\Neon.Core.Serializers.RTL.pas',
-  Neon.Core.Serializers.DB in '..\..\Source\Neon.Core.Serializers.DB.pas',
-  Neon.Core.TypeInfo in '..\..\Source\Neon.Core.TypeInfo.pas',
-  Neon.Core.Types in '..\..\Source\Neon.Core.Types.pas',
-  Neon.Core.Utils in '..\..\Source\Neon.Core.Utils.pas';
+  Neon.Core.Persistence,
+  Neon.Tests.Entities,
+  Neon.Tests.Utils;
+
+type
+  [TestFixture]
+  [Category('attrinclude')]
+  TTestAttributesInclude = class(TObject)
+  public
+    constructor Create;
+    destructor Destroy; override;
+
+    [Setup]
+    procedure Setup;
+    [TearDown]
+    procedure TearDown;
+
+    [Test]
+    procedure TestIncludeIfAlways(const AMethod: string);
+  end;
+
+implementation
+
+uses
+  System.IOUtils, System.DateUtils;
+
+constructor TTestAttributesInclude.Create;
+begin
+
+end;
+
+destructor TTestAttributesInclude.Destroy;
+begin
+
+  inherited;
+end;
+
+procedure TTestAttributesInclude.Setup;
+begin
+end;
+
+procedure TTestAttributesInclude.TearDown;
+begin
+end;
+
+procedure TTestAttributesInclude.TestIncludeIfAlways(const AMethod: string);
+begin
+
+end;
+
+initialization
+  TDUnitX.RegisterTestFixture(TTestAttributesInclude);
 
 end.
-

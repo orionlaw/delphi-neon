@@ -5,46 +5,49 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls,
-  Demo.Forms.Serialization.Base;
+  Demo.Forms.Serialization.Base, System.ImageList, Vcl.ImgList,
+  Vcl.CategoryButtons, System.Actions, Vcl.ActnList;
 
 type
   TfrmSerializationSimple = class(TfrmSerializationBase)
-    btnSerSimpleInteger: TButton;
-    btnSerSimpleString: TButton;
-    btnSerSimpleDatTime: TButton;
-    btnSerSimpleRecord: TButton;
-    btnSerSimpleArray: TButton;
-    btnSerSimpleFloat: TButton;
-    btnSerSimpleBool: TButton;
-    btnDesSimpleInteger: TButton;
-    btnDesSimpleString: TButton;
-    btnDesSimpleDateTime: TButton;
-    btnDesSimpleRecord: TButton;
-    btnDesSimpleArray: TButton;
-    btnDesSimpleFloat: TButton;
-    btnDesSimpleBool: TButton;
-    btnSerTypeClass: TButton;
-    btnDesTypeClass: TButton;
-    procedure btnDesSimpleArrayClick(Sender: TObject);
-    procedure btnDesSimpleBoolClick(Sender: TObject);
-    procedure btnDesSimpleDateTimeClick(Sender: TObject);
-    procedure btnDesSimpleFloatClick(Sender: TObject);
-    procedure btnDesSimpleIntegerClick(Sender: TObject);
-    procedure btnDesSimpleRecordClick(Sender: TObject);
-    procedure btnDesSimpleStringClick(Sender: TObject);
-    procedure btnSerSimpleArrayClick(Sender: TObject);
-    procedure btnSerSimpleBoolClick(Sender: TObject);
-    procedure btnSerTypeClassClick(Sender: TObject);
-    procedure btnSerSimpleDatTimeClick(Sender: TObject);
-    procedure btnSerSimpleFloatClick(Sender: TObject);
-    procedure btnSerSimpleIntegerClick(Sender: TObject);
-    procedure btnSerSimpleRecordClick(Sender: TObject);
-    procedure btnSerSimpleStringClick(Sender: TObject);
-    procedure btnDesTypeClassClick(Sender: TObject);
+    actSerInteger: TAction;
+    actSerString: TAction;
+    actSerFloat: TAction;
+    actSerBoolean: TAction;
+    actSerDateTime: TAction;
+    actSerTypesClass: TAction;
+    actSerVariants: TAction;
+    actSerEnum: TAction;
+    actSerEnumCustom: TAction;
+    actDesInteger: TAction;
+    actDesString: TAction;
+    actDesFloat: TAction;
+    actDesBoolean: TAction;
+    actDesDateTime: TAction;
+    actDesTypesClass: TAction;
+    actDesVariants: TAction;
+    actDesEnum: TAction;
+    actDesEnumCustom: TAction;
+    procedure actDesDateTimeExecute(Sender: TObject);
+    procedure actDesBooleanExecute(Sender: TObject);
+    procedure actDesEnumCustomExecute(Sender: TObject);
+    procedure actDesEnumExecute(Sender: TObject);
+    procedure actDesFloatExecute(Sender: TObject);
+    procedure actDesIntegerExecute(Sender: TObject);
+    procedure actDesStringExecute(Sender: TObject);
+    procedure actDesTypesClassExecute(Sender: TObject);
+    procedure actDesVariantsExecute(Sender: TObject);
+    procedure actSerBooleanExecute(Sender: TObject);
+    procedure actSerDateTimeExecute(Sender: TObject);
+    procedure actSerEnumCustomExecute(Sender: TObject);
+    procedure actSerEnumExecute(Sender: TObject);
+    procedure actSerFloatExecute(Sender: TObject);
+    procedure actSerIntegerExecute(Sender: TObject);
+    procedure actSerStringExecute(Sender: TObject);
+    procedure actSerTypesClassExecute(Sender: TObject);
+    procedure actSerVariantsExecute(Sender: TObject);
   private
-    procedure SerializeSimple<T>(AValue: T);
-    procedure DeserializeSimple<T>; overload;
-    procedure DeserializeSimple<T>(AValue: T); overload;
+    { Private declarations }
   public
     { Public declarations }
   end;
@@ -60,105 +63,42 @@ uses
 
 {$R *.dfm}
 
-procedure TfrmSerializationSimple.btnDesSimpleArrayClick(Sender: TObject);
-var
-  LVal: TIntArray;
-begin
-  LVal := [];
-  DeserializeSimple<TIntArray>(LVal);
-end;
-
-procedure TfrmSerializationSimple.btnDesSimpleBoolClick(Sender: TObject);
-begin
-  DeserializeSimple<Boolean>;
-end;
-
-procedure TfrmSerializationSimple.btnDesSimpleDateTimeClick(Sender: TObject);
+procedure TfrmSerializationSimple.actDesDateTimeExecute(Sender: TObject);
 begin
   DeserializeSimple<TDateTime>;
 end;
 
-procedure TfrmSerializationSimple.btnDesSimpleFloatClick(Sender: TObject);
+procedure TfrmSerializationSimple.actDesBooleanExecute(Sender: TObject);
+begin
+  DeserializeSimple<Boolean>;
+end;
+
+procedure TfrmSerializationSimple.actDesEnumCustomExecute(Sender: TObject);
+begin
+  DeserializeSimple<TEnumSpeed>;
+end;
+
+procedure TfrmSerializationSimple.actDesEnumExecute(Sender: TObject);
+begin
+  DeserializeSimple<TDuplicates>;
+end;
+
+procedure TfrmSerializationSimple.actDesFloatExecute(Sender: TObject);
 begin
   DeserializeSimple<Double>;
 end;
 
-procedure TfrmSerializationSimple.btnDesSimpleIntegerClick(Sender: TObject);
+procedure TfrmSerializationSimple.actDesIntegerExecute(Sender: TObject);
 begin
   DeserializeSimple<Integer>;
 end;
 
-procedure TfrmSerializationSimple.btnDesSimpleRecordClick(Sender: TObject);
-var
-  LRecord: TMyRecord;
-begin
-  DeserializeSimple<TMyRecord>(LRecord);
-end;
-
-procedure TfrmSerializationSimple.btnDesSimpleStringClick(Sender: TObject);
+procedure TfrmSerializationSimple.actDesStringExecute(Sender: TObject);
 begin
   DeserializeSimple<string>;
 end;
 
-procedure TfrmSerializationSimple.btnSerSimpleArrayClick(Sender: TObject);
-var
-  LVal: TIntArray;
-begin
-  SetLength(LVal, 4);
-  LVal[0] := 12;
-  LVal[1] := 34;
-  LVal[2] := 797;
-  LVal[3] := 5236;
-  SerializeSimple<TIntArray>(LVal);
-end;
-
-procedure TfrmSerializationSimple.btnSerSimpleBoolClick(Sender: TObject);
-begin
-  SerializeSimple<Boolean>(True);
-end;
-
-procedure TfrmSerializationSimple.btnSerTypeClassClick(Sender: TObject);
-var
-  LTypeObj: TTypeClass;
-begin
-  LTypeObj := TTypeClass.Create;
-  try
-    SerializeObject(LTypeObj, memoSerialize.Lines, frmConfiguration.BuildSerializerConfig);
-  finally
-    LTypeObj.Free;
-  end;
-end;
-
-procedure TfrmSerializationSimple.btnSerSimpleDatTimeClick(Sender: TObject);
-begin
-  SerializeSimple<TDateTime>(Now);
-end;
-
-procedure TfrmSerializationSimple.btnSerSimpleFloatClick(Sender: TObject);
-begin
-  SerializeSimple<Double>(123.42);
-end;
-
-procedure TfrmSerializationSimple.btnSerSimpleIntegerClick(Sender: TObject);
-begin
-  SerializeSimple<Integer>(42);
-end;
-
-procedure TfrmSerializationSimple.btnSerSimpleRecordClick(Sender: TObject);
-var
-  LVal: TMyRecord;
-begin
-  LVal.One := 'Test Test Test';
-  LVal.Two := 42;
-  SerializeSimple<TMyRecord>(LVal);
-end;
-
-procedure TfrmSerializationSimple.btnSerSimpleStringClick(Sender: TObject);
-begin
-  SerializeSimple<string>('Lorem "Ipsum" \n \\ {}');
-end;
-
-procedure TfrmSerializationSimple.btnDesTypeClassClick(Sender: TObject);
+procedure TfrmSerializationSimple.actDesTypesClassExecute(Sender: TObject);
 var
   LTypeClass: TTypeClass;
 begin
@@ -171,32 +111,83 @@ begin
   end;
 end;
 
-procedure TfrmSerializationSimple.DeserializeSimple<T>(AValue: T);
+procedure TfrmSerializationSimple.actDesVariantsExecute(Sender: TObject);
 var
-  LVal: T;
+  LVariantObj: TVariantEntity;
 begin
-  LVal := DeserializeValueTo<T>(AValue,
-    memoSerialize.Lines, frmConfiguration.BuildSerializerConfig);
-
-  SerializeValueFrom<T>(
-    TValue.From<T>(LVal), memoDeserialize.Lines, frmConfiguration.BuildSerializerConfig);
+  LVariantObj := TVariantEntity.Create;
+  try
+    DeserializeObject(LVariantObj, memoSerialize.Lines, frmConfiguration.BuildSerializerConfig);
+    SerializeObject(LVariantObj, memoDeserialize.Lines, frmConfiguration.BuildSerializerConfig);
+  finally
+    LVariantObj.Free;
+  end;
 end;
 
-procedure TfrmSerializationSimple.DeserializeSimple<T>;
-var
-  LVal: T;
+procedure TfrmSerializationSimple.actSerBooleanExecute(Sender: TObject);
 begin
-  LVal := DeserializeValueTo<T>(
-    memoSerialize.Lines, frmConfiguration.BuildSerializerConfig);
-
-  SerializeValueFrom<T>(
-    TValue.From<T>(LVal), memoDeserialize.Lines, frmConfiguration.BuildSerializerConfig);
+  SerializeSimple<Boolean>(True);
 end;
 
-procedure TfrmSerializationSimple.SerializeSimple<T>(AValue: T);
+procedure TfrmSerializationSimple.actSerDateTimeExecute(Sender: TObject);
 begin
-  SerializeValueFrom<T>(
-    TValue.From<T>(AValue), memoSerialize.Lines, frmConfiguration.BuildSerializerConfig);
+  SerializeSimple<TDateTime>(Now);
+end;
+
+procedure TfrmSerializationSimple.actSerEnumCustomExecute(Sender: TObject);
+begin
+  SerializeSimple<TEnumSpeed>(TEnumSpeed.High);
+end;
+
+procedure TfrmSerializationSimple.actSerEnumExecute(Sender: TObject);
+begin
+  SerializeSimple<TDuplicates>(dupIgnore);
+end;
+
+procedure TfrmSerializationSimple.actSerFloatExecute(Sender: TObject);
+begin
+  SerializeSimple<Double>(123.42);
+end;
+
+procedure TfrmSerializationSimple.actSerIntegerExecute(Sender: TObject);
+begin
+  SerializeSimple<Integer>(42);
+end;
+
+procedure TfrmSerializationSimple.actSerStringExecute(Sender: TObject);
+begin
+  SerializeSimple<string>('Lorem "Ipsum" \n \\ {} итзам');
+end;
+
+procedure TfrmSerializationSimple.actSerTypesClassExecute(Sender: TObject);
+var
+  LTypeObj: TTypeClass;
+begin
+  LTypeObj := TTypeClass.Create;
+  try
+    SerializeObject(LTypeObj, memoSerialize.Lines, frmConfiguration.BuildSerializerConfig);
+  finally
+    LTypeObj.Free;
+  end;
+end;
+
+procedure TfrmSerializationSimple.actSerVariantsExecute(Sender: TObject);
+var
+  LVariantObj: TVariantEntity;
+begin
+  LVariantObj := TVariantEntity.Create;
+
+  LVariantObj.Prop1 := Null;
+  LVariantObj.Prop2 := 'Paolo';
+  LVariantObj.Prop3 := 123.45;
+  LVariantObj.Prop4 := True;
+  LVariantObj.Prop5 := Now();
+
+  try
+    SerializeObject(LVariantObj, memoSerialize.Lines, frmConfiguration.BuildSerializerConfig);
+  finally
+    LVariantObj.Free;
+  end;
 end;
 
 end.

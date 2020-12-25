@@ -35,7 +35,6 @@ uses
   Neon.Core.Types,
   Neon.Core.Attributes,
   Neon.Core.Persistence,
-  Neon.Core.Serializers,
   Neon.Core.Persistence.JSON,
   Neon.Core.Utils,
   Demo.Frame.Configuration,
@@ -64,8 +63,8 @@ uses
   System.Generics.Collections, Vcl.Graphics,
 
   Demo.Forms.Serialization.Custom, Demo.Forms.Serialization.Delphi,
-  Demo.Forms.Serialization.Simple, Demo.Forms.Serialization.Complex,
-  Demo.Forms.Serialization.Schema;
+  Demo.Forms.Serialization.Simple, Demo.Forms.Serialization.Records,
+  Demo.Forms.Serialization.Schema, Demo.Forms.Serialization.Complex;
 
 { TMainForm }
 
@@ -90,9 +89,10 @@ begin
   frmConfiguration.Initialize;
 
   CreateTab('Simple Types', clGreen, TfrmSerializationSimple);
-  CreateTab('Complex Types', clNavy, TfrmSerializationComplex);
+  CreateTab('Value Types', clTeal, TfrmSerializationRecords);
+  CreateTab('Reference Types', clNavy, TfrmSerializationComplex);
   CreateTab('Delphi Types', clOlive, TfrmSerializationDelphi);
-  CreateTab('Custom Types', clMaroon, TfrmSerializationCustom);
+  CreateTab('Custom Serializers', clMaroon, TfrmSerializationCustom);
   CreateTab('JSON Schema', clWebTan, TfrmSerializationSchema);
 end;
 

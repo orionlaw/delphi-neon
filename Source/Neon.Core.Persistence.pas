@@ -107,6 +107,7 @@ type
   public
     procedure Clear;
     procedure ClearCache;
+    procedure Assign(ARegistry: TNeonSerializerRegistry);
 
     function RegisterSerializer(ASerializerClass: TCustomSerializerClass): TNeonSerializerRegistry; overload;
     procedure UnregisterSerializer(ASerializerClass: TCustomSerializerClass);
@@ -290,13 +291,16 @@ type
     property Errors: TStrings read FErrors write FErrors;
   end;
 
+  TTypeInfoUtils = class
+    class function EnumToString(ATypeInfo: PTypeInfo; AValue: Integer; ANeonObject: TNeonRttiObject): string; static;
+  end;
+
 
 implementation
 
 uses
   System.RegularExpressions,
-  Neon.Core.Utils,
-  Neon.Core.Serializers;
+  Neon.Core.Utils;
 
 { TNeonBase }
 
@@ -441,8 +445,6 @@ end;
 class function TNeonConfiguration.Default: INeonConfiguration;
 begin
   Result := TNeonConfiguration.Create;
-
-  RegisterDefaultSerializers(Result.GetSerializers);
 end;
 
 destructor TNeonConfiguration.Destroy;
@@ -470,16 +472,12 @@ class function TNeonConfiguration.Pretty: INeonConfiguration;
 begin
   Result := TNeonConfiguration.Create;
   Result.SetPrettyPrint(True);
-
-  RegisterDefaultSerializers(Result.GetSerializers);
 end;
 
 class function TNeonConfiguration.Camel: INeonConfiguration;
 begin
   Result := TNeonConfiguration.Create;
   Result.SetMemberCase(TNeonCase.CamelCase);
-
-  RegisterDefaultSerializers(Result.GetSerializers);
 end;
 
 class function TNeonConfiguration.Snake: INeonConfiguration;
@@ -487,8 +485,6 @@ begin
   Result := TNeonConfiguration.Create;
   Result.SetIgnoreFieldPrefix(True);
   Result.SetMemberCase(TNeonCase.SnakeCase);
-
-  RegisterDefaultSerializers(Result.GetSerializers);
 end;
 
 function TNeonConfiguration.SetMembers(AValue: TNeonMembersSet): INeonConfiguration;
@@ -665,7 +661,11 @@ end;
 procedure TNeonRttiMember.SetValue(const AValue: TValue);
 begin
   case FMemberType of
-    TNeonMemberType.Prop : MemberAsProperty.SetValue(FParent.Instance, AValue);
+    TNeonMemberType.Prop :
+    begin
+      if MemberAsProperty.IsWritable then
+        MemberAsProperty.SetValue(FParent.Instance, AValue);
+    end;
     TNeonMemberType.Field: MemberAsField.SetValue(FParent.Instance, AValue);
   end;
 end;
@@ -958,6 +958,19 @@ begin
 end;
 
 { TNeonSerializerRegistry }
+
+procedure TNeonSerializerRegistry.Assign(ARegistry: TNeonSerializerRegistry);
+var
+  LInfo: TSerializerInfo;
+  LPair: TPair<PTypeInfo, TCustomSerializer>;
+begin
+  for LInfo in ARegistry.FRegistryClass do
+    FRegistryClass.Add(LInfo);
+
+  for LPair in ARegistry.FRegistryCache do
+    FRegistryCache.Add(LPair.Key, LPair.Value);
+end;
+
 procedure TNeonSerializerRegistry.Clear;
 begin
   FRegistryClass.Clear;
@@ -1115,6 +1128,31 @@ class function TSerializerInfo.FromSerializer(ASerializerClass: TCustomSerialize
 begin
   Result.SerializerClass := ASerializerClass;
   Result.Distance := ASerializerClass.ClassDistance;
+end;
+
+{ TTypeInfoUtils }
+
+class function TTypeInfoUtils.EnumToString(ATypeInfo: PTypeInfo; AValue: Integer;
+    ANeonObject: TNeonRttiObject): string;
+var
+  LTypeData: PTypeData;
+begin
+  Result := '';
+
+  LTypeData := GetTypeData(ATypeInfo);
+  if (AValue >= LTypeData.MinValue) and (AValue <= LTypeData.MaxValue) then
+  begin
+    Result := GetEnumName(ATypeInfo, AValue);
+
+    if Length(ANeonObject.NeonEnumNames) > 0 then
+    begin
+      if (AValue >= Low(ANeonObject.NeonEnumNames)) and
+         (AValue <= High(ANeonObject.NeonEnumNames)) then
+        Result := ANeonObject.NeonEnumNames[AValue]
+    end;
+  end
+  else
+    raise ENeonException.Create('Enum value out of bound: ' + AValue.ToString);
 end;
 
 end.

@@ -23,6 +23,8 @@ unit Demo.Neon.Entities;
 
 interface
 
+{$I Neon.inc}
+
 uses
   System.SysUtils, System.Classes, System.Contnrs, System.Generics.Collections,
   System.Math, System.Math.Vectors, System.Types, system.JSON, Vcl.Graphics,
@@ -35,9 +37,43 @@ uses
 {$SCOPEDENUMS ON}
 
 type
+  TCustomDate = type TDateTime;
+
+  TDates = record
+    Date: TDateTime;
+    Time: TTime;
+    Custom: TCustomDate;
+    procedure SampleData;
+  end;
 
   [NeonEnumNames('Low Speed,Medium Speed,High Speed')]
   TEnumSpeed = (Low, Medium, High);
+
+  TSetSpeed = set of TEnumSpeed;
+
+  TArraySpeed = TArray<TEnumSpeed>;
+
+  TArrayDuplicates = TArray<TDuplicates>;
+
+  TSetDuplicates = set of TDuplicates;
+
+  TSetBoolean = set of Boolean;
+
+  TWeekDays = 1..7;
+  TSetWeekDays = set of TWeekDays;
+
+  TUppercase = 'A'..'Z';
+  TSetUppercase = set of TUppercase;
+
+  TManagedRecord = record
+    Name: string;
+    Age: Integer;
+    Height: Double;
+    {$IFDEF HAS_MRECORDS}
+    class operator Initialize (out Dest: TManagedRecord);
+    class operator Finalize (var Dest: TManagedRecord);
+    {$ENDIF}
+  end;
 
   // Sample
   TVector3f = record
@@ -285,6 +321,9 @@ type
     procedure DefaultValues; override;
   end;
 
+  /// <summary>
+  ///   Entity to test simple type properties
+  /// </summary>
   TTypeClass = class
   private
     FPropInteger: Integer;
@@ -323,22 +362,93 @@ type
     property PropEnum: TTypeKind read FPropEnum write FPropEnum;
   end;
 
-
+  /// <summary>
+  ///   Entity to test the Nullables serialization
+  /// </summary>
   TClassOfNullables = class
   private
     FName: NullString;
     FAge: NullInteger;
     FSpeed: Nullable<TEnumSpeed>;
+    FObj: TObject;
   public
+    [NeonInclude(IncludeIf.Always)]
+    property Obj: TObject read FObj write FObj;
+    [NeonInclude(IncludeIf.Always)]
     property Name: NullString read FName write FName;
-    //[NeonInclude(Include.NotEmpty)]
+    [NeonInclude(IncludeIf.NotNull)]
     property Age: NullInteger read FAge write FAge;
     property Speed: Nullable<TEnumSpeed> read FSpeed write FSpeed;
   end;
 
+  /// <summary>
+  ///   Entity to test the NeonInclude attribute (IncludeIf enum)
+  /// </summary>
+  TNeonIncludeEntity = class
+  private
+    FNullObject1: TObject;
+    FNullObject2: TObject;
+    FNString: NullString;
+    FNInteger: NullInteger;
+    FName: string;
+    FObj: TObject;
+
+    function ShouldInclude(const AContext: TNeonIgnoreIfContext): Boolean;
+  public
+    [NeonInclude(IncludeIf.CustomFunction)]
+    property Name: string read FName write FName;
+    [NeonInclude(IncludeIf.CustomFunction)]
+    property Obj: TObject read FObj write FObj;
+
+    [NeonInclude(IncludeIf.Always)]
+    property NullObject1: TObject read FNullObject1 write FNullObject1;
+    [NeonInclude(IncludeIf.NotNull)]
+    property NullObject2: TObject read FNullObject2 write FNullObject2;
+    [NeonInclude(IncludeIf.NotEmpty)]
+    property NString: NullString read FNString write FNString;
+    [NeonInclude(IncludeIf.NotDefault)]
+    property NInteger: NullInteger read FNInteger write FNInteger;
+  end;
+
+  /// <summary>
+  ///   Entity to test conversion to and from variants
+  /// </summary>
+  TVariantEntity = class
+  private
+    FProp1: Variant;
+    FProp2: Variant;
+    FProp3: Variant;
+    FProp4: Variant;
+    FProp5: Variant;
+  public
+    property Prop1: Variant read FProp1 write FProp1;
+    property Prop2: Variant read FProp2 write FProp2;
+    property Prop3: Variant read FProp3 write FProp3;
+    property Prop4: Variant read FProp4 write FProp4;
+    property Prop5: Variant read FProp5 write FProp5;
+  end;
 
 
 implementation
+
+
+{$IFDEF HAS_MRECORDS}
+
+{ TManagedRecord }
+
+class operator TManagedRecord.Initialize(out Dest: TManagedRecord);
+begin
+  Dest.Name := '';
+  Dest.Age := 0;
+  Dest.Height := 0;
+end;
+
+class operator TManagedRecord.Finalize(var Dest: TManagedRecord);
+begin
+
+end;
+
+{$ENDIF}
 
 { TPerson }
 
@@ -583,7 +693,7 @@ end;
 
 function TAddress.ToString: string;
 begin
-  Result := 'Key-' + FCity;
+  Result := FCity;
 end;
 
 
@@ -594,6 +704,33 @@ begin
   inherited;
   FPropertyTest := 'property added';
   FieldTest := 'my field: hello world!';
+end;
+
+{ TNeonIncludeEntity }
+
+function TNeonIncludeEntity.ShouldInclude(const AContext: TNeonIgnoreIfContext): Boolean;
+begin
+  Result := False;
+
+  // You can filter by the member name
+  if SameText(AContext.MemberName, 'Name') then
+  begin
+    Result := True;
+  end
+  // You can reuse (only if you want) the same function for several members
+  else if SameText(AContext.MemberName, 'Obj') then
+  begin
+    Result := True;
+  end;
+end;
+
+{ TDates }
+
+procedure TDates.SampleData;
+begin
+  Date := Now;
+  Time := Now + 0.5;
+  Custom := Now + 2;
 end;
 
 initialization

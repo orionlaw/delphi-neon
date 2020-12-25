@@ -26,7 +26,7 @@ package NeonRunTime_crossPlatform;
 {$DEFINE DEBUG}
 {$ENDIF IMPLICITBUILDING}
 {$DESCRIPTION 'Neon Serialization Library'}
-{$LIBSUFFIX '260'}
+{$LIBSUFFIX '270'}
 {$RUNONLY}
 {$IMPLICITBUILD ON}
 

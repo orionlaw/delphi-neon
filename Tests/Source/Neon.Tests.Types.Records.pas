@@ -19,54 +19,76 @@
 {  limitations under the License.                                              }
 {                                                                              }
 {******************************************************************************}
-package NeonRunTime;
+unit Neon.Tests.Types.Records;
 
-{$R *.res}
-{$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
-{$ALIGN 8}
-{$ASSERTIONS ON}
-{$BOOLEVAL OFF}
-{$DEBUGINFO OFF}
-{$EXTENDEDSYNTAX ON}
-{$IMPORTEDDATA ON}
-{$IOCHECKS ON}
-{$LOCALSYMBOLS ON}
-{$LONGSTRINGS ON}
-{$OPENSTRINGS ON}
-{$OPTIMIZATION OFF}
-{$OVERFLOWCHECKS OFF}
-{$RANGECHECKS OFF}
-{$REFERENCEINFO ON}
-{$SAFEDIVIDE OFF}
-{$STACKFRAMES ON}
-{$TYPEDADDRESS OFF}
-{$VARSTRINGCHECKS ON}
-{$WRITEABLECONST OFF}
-{$MINENUMSIZE 1}
-{$IMAGEBASE $400000}
-{$DEFINE DEBUG}
-{$ENDIF IMPLICITBUILDING}
-{$DESCRIPTION 'Neon Serialization Library'}
-{$LIBSUFFIX '260'}
-{$RUNONLY}
-{$IMPLICITBUILD OFF}
+interface
 
-requires
-  rtl,
-  dbrtl;
+uses
+  System.Rtti, DUnitX.TestFramework,
 
-contains
-  Neon.Core.Attributes in '..\..\Source\Neon.Core.Attributes.pas',
-  Neon.Core.DynamicTypes in '..\..\Source\Neon.Core.DynamicTypes.pas',
-  Neon.Core.Nullables in '..\..\Source\Neon.Core.Nullables.pas',
-  Neon.Core.Persistence.JSON in '..\..\Source\Neon.Core.Persistence.JSON.pas',
-  Neon.Core.Persistence in '..\..\Source\Neon.Core.Persistence.pas',
-  Neon.Core.Persistence.Swagger in '..\..\Source\Neon.Core.Persistence.Swagger.pas',
-  Neon.Core.Serializers.RTL in '..\..\Source\Neon.Core.Serializers.RTL.pas',
-  Neon.Core.Serializers.DB in '..\..\Source\Neon.Core.Serializers.DB.pas',
-  Neon.Core.TypeInfo in '..\..\Source\Neon.Core.TypeInfo.pas',
-  Neon.Core.Types in '..\..\Source\Neon.Core.Types.pas',
-  Neon.Core.Utils in '..\..\Source\Neon.Core.Utils.pas';
+  Neon.Tests.Entities,
+  Neon.Tests.Utils;
+
+type
+
+  [TestFixture]
+  [Category('recordtypes')]
+  TTestRecordTypes = class(TObject)
+  private
+    FSimpleRecord: TSimpleRecord;
+    FManagedrecord: TManagedRecord;
+  public
+    constructor Create;
+
+    [Setup]
+    procedure Setup;
+    [TearDown]
+    procedure TearDown;
+
+    [Test]
+    [TestCase('TestSimpleRecord', '{"Name":"Paolo","BirthDate":"1969-02-02T03:23:54.000Z","Age":50}', '|')]
+    procedure TestSimpleRecord(_Result: string);
+
+    [Test]
+    [TestCase('TestManagedRecord', '{"Name":"Luca","Age":43,"Height":1.8}', '|')]
+    procedure TestManagedRecord(_Result: string);
+  end;
+
+implementation
+
+uses
+  System.DateUtils;
+
+constructor TTestRecordTypes.Create;
+begin
+  FSimpleRecord.Name := 'Paolo';
+  FSimpleRecord.BirthDate := EncodeDateTime(1969, 02, 02, 03, 23, 54, 0);
+  FSimpleRecord.Age := 50;
+
+  FManagedrecord.Name := 'Luca';
+  FManagedrecord.Age := 43;
+  FManagedrecord.Height := 1.80;
+end;
+
+procedure TTestRecordTypes.Setup;
+begin
+end;
+
+procedure TTestRecordTypes.TearDown;
+begin
+end;
+
+procedure TTestRecordTypes.TestManagedRecord(_Result: string);
+begin
+  Assert.AreEqual(_Result, TTestUtils.SerializeValue(TValue.From<TManagedRecord>(FManagedRecord)));
+end;
+
+procedure TTestRecordTypes.TestSimpleRecord(_Result: string);
+begin
+  Assert.AreEqual(_Result, TTestUtils.SerializeValue(TValue.From<TSimpleRecord>(FSimpleRecord)));
+end;
+
+initialization
+  TDUnitX.RegisterTestFixture(TTestRecordTypes);
 
 end.
-
