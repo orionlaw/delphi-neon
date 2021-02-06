@@ -46,6 +46,8 @@ type
     function SetIgnoreFieldPrefix(AValue: Boolean): INeonConfiguration;
     function SetUseUTCDate(AValue: Boolean): INeonConfiguration;
     function SetPrettyPrint(AValue: Boolean): INeonConfiguration;
+    function SetEnumerationsAsInt(AValue: Boolean): INeonConfiguration;
+    function SetIncludeDatesIfNotEmpty(AValue: Boolean): INeonConfiguration;
 
     function GetPrettyPrint: Boolean;
     function GetUseUTCDate: Boolean;
@@ -139,6 +141,8 @@ type
     FUseUTCDate: Boolean;
     FPrettyPrint: Boolean;
     FSerializers: TNeonSerializerRegistry;
+    FEnumerationsAsInt: Boolean;
+    FIncludeDatesIfNotEmpty: Boolean;
   public
     constructor Create;
     destructor Destroy; override;
@@ -155,6 +159,8 @@ type
     function SetIgnoreFieldPrefix(AValue: Boolean): INeonConfiguration;
     function SetUseUTCDate(AValue: Boolean): INeonConfiguration;
     function SetPrettyPrint(AValue: Boolean): INeonConfiguration;
+    function SetEnumerationsAsInt(AValue: Boolean): INeonConfiguration;
+    function SetIncludeDatesIfNotEmpty(AValue: Boolean): INeonConfiguration;
 
     function GetUseUTCDate: Boolean;
     function GetPrettyPrint: Boolean;
@@ -167,6 +173,8 @@ type
     property IgnoreFieldPrefix: Boolean read FIgnoreFieldPrefix write FIgnoreFieldPrefix;
     property UseUTCDate: Boolean read FUseUTCDate write FUseUTCDate;
     property Serializers: TNeonSerializerRegistry read FSerializers write FSerializers;
+    property EnumerationsAsInt: Boolean read FEnumerationsAsInt write FEnumerationsAsInt;
+    property IncludeDatesIfNotEmpty: Boolean read FIncludeDatesIfNotEmpty write FIncludeDatesIfNotEmpty;
   end;
 
   TNeonRttiObject = class
@@ -505,10 +513,22 @@ begin
   Result := Self;
 end;
 
+function TNeonConfiguration.SetEnumerationsAsInt(AValue: Boolean): INeonConfiguration;
+begin
+  FEnumerationsAsInt := AValue;
+  Result := Self;
+end;
+
 function TNeonConfiguration.SetIgnoreFieldPrefix(AValue: Boolean): INeonConfiguration;
 begin
   FIgnoreFieldPrefix := AValue;
   Result := Self;
+end;
+
+function TNeonConfiguration.SetIncludeDatesIfNotEmpty(AValue: Boolean): INeonConfiguration;
+begin
+  FIncludeDatesIfNotEmpty := AValue;
+  result := Self;
 end;
 
 function TNeonConfiguration.SetMemberCase(AValue: TNeonCase): INeonConfiguration;
